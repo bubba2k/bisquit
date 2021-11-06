@@ -4,7 +4,8 @@
 #include <string>
 #include <vector>
 #include <array>
-#include "parse.hpp"
+
+#include "common.hpp"
 
 struct Keyword
 {

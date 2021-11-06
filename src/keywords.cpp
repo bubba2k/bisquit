@@ -1,6 +1,7 @@
 #include <string>
 #include <functional>
 
+#include "common.hpp"
 #include "keywords.hpp"
 
 const std::vector<Keyword> keywords =

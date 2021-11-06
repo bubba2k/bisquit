@@ -1,10 +1,7 @@
 #include <iostream>
-#include <vector>
 #include <string>
-#include <array>
 #include <fstream>
 #include <algorithm>
-#include <exception>
 
 #include "parse.hpp"
 
@@ -31,12 +28,14 @@ int main(int argc, char * argv[])
 {
 	std::ifstream infile = get_infile(argc, argv);
 	std::string word;
+    std::vector<Token> tokens;
+
 	while(infile >> word)
 	{
 		try
 		{
-			Symbol sym(word);
-			sym.print();
+			Token token(word);
+			tokens.push_back(token);
 		}
 		catch(MalformedIdentifierExcept& exc)
 		{
@@ -50,12 +49,15 @@ int main(int argc, char * argv[])
 					  << "\nAborting..." << std::endl;
 			exit(EXIT_FAILURE);
 		}
-		catch(WrongSymbolExcept& exc)
+		catch(WrongTokenExcept& exc)
 		{
 			std::cout << "Wrong symbol type\n Aborting..." << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	}
+
+    Instruction instr(tokens);
+    instr.print();
 
 	return 0;
 }

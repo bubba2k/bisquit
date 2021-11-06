@@ -1,9 +1,11 @@
 #include <iostream>
 #include <exception>
-#include <array>
+#include <algorithm>
 
 #include "keywords.hpp"
 #include "parse.hpp"
+#include "common.hpp"
+
 
 bool is_keyword(std::string str)
 {
@@ -85,6 +87,7 @@ bool Token::parse_as_identifier(const std::string &str)
 	{
 		type = TokenType::IDENTIFIER;
 		val_string = str;
+        return true;
 	}
 		return false;
 }
@@ -105,44 +108,81 @@ void Token::print() const
 	switch(type)
 	{
 		case TokenType::IDENTIFIER:
-			std::cout << "Identifier: \"" << val_string << "\"";
+			std::cerr << "Identifier: \"" << val_string << "\"";
 			break;
 		case TokenType::KEYWORD:
-			std::cout << "Keyword: \"" << val_string << "\"";
+			std::cerr << "Keyword: \"" << val_string << "\"";
 			break;
 
 		case TokenType::LITERAL:
-			std::cout << "Literal of type ";
+			std::cerr << "Literal of type ";
 			if(literal_type == ValueType::DECIMAL)
-				std::cout << "decimal: " << val_float;
+				std::cerr << "decimal: " << val_float;
 			else if(literal_type == ValueType::STRING)
-				std::cout << "string: \"" << val_string << "\"";
+				std::cerr << "string: \"" << val_string << "\"";
 			break;
 		case TokenType::ID_OR_LIT:
 			std::cerr << "Identifier or Literal?! Something went terribly wrong!!";
 	}
 		
-	std::cout << std::endl;
+	std::cerr << std::endl;
 }
 
 
 
 Instruction::Instruction(std::vector<Token>& _token_list)
 {
+    // move over the tokens
 	tokens = std::move(_token_list);
 
-	// resolve our keyword
-	auto keyword_it = std::find(keywords.begin(), keywords.end(), tokens[0].val_string);
+    // resolve our keyword
+    auto keyword_it = std::find_if(keywords.begin(), keywords.end(), [&, this](auto& v){
+        if(v.name == tokens[0].val_string)
+            return true;
+        else
+            return false;
+    });
 
 	// Throw if unknown
 	if(keyword_it == keywords.end())
 		throw UnknownKeywordExcept(tokens[0].val_string);
 	else
-		keyword_ptr = &*keyword_it;
+		keyword_ptr = &(*keyword_it);
 
 	// Make sure the keyword gets the number of arguments it needs
 	if(keyword_ptr->expected_num_args != -1 && (keyword_ptr->expected_num_args != tokens.size() - 1))
 		throw WrongArgumentCountExcept(keyword_ptr->name, keyword_ptr->expected_num_args, tokens.size() - 1);
 
-	
+	// Check the arguments supplied are the right kind of tokens
+    for(int i = 0; i < keyword_ptr->expected_num_args; i++)
+    {
+        if(keyword_ptr->expected_token_types[i] != tokens[i+1].type)
+            throw WrongTokenExcept(keyword_ptr->name, tokens[i+1].val_string, keyword_ptr->expected_token_types[i],
+                                   tokens[i+1].type);
+    }
+
+    // if arbitrary number of args are expected, they're all one type
+    if(keyword_ptr->expected_num_args == -1)
+    {
+        for (auto it = tokens.begin() + 1; it != tokens.end(); it++)
+        {
+            if (keyword_ptr->expected_token_types[0] != it->type)
+                throw WrongTokenExcept(keyword_ptr->name, it->val_string, keyword_ptr->expected_token_types[0],
+                                       it->type);
+        }
+    }
+
+    // If all checks succeeded, we consider this Instruction valid. Note that type checking occurs later at
+    // runtime, when the instruction is executed.
+    // We now get rid of the keyword token to save some space.
+    tokens.erase(tokens.begin());
+}
+
+void Instruction::print()
+{
+    std::cerr << "INSTRUCTION: " << keyword_ptr->name << "\n";
+    for(auto& token : tokens)
+        token.print();
+
+    std::cerr << std::endl;
 }

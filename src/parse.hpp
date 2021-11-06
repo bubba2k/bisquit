@@ -4,22 +4,9 @@
 #include <exception>
 #include <string>
 #include <vector>
+
 #include "keywords.hpp"
-
-enum TokenType
-{
-	KEYWORD,
-	IDENTIFIER,
-	LITERAL,
-	ID_OR_LIT
-};
-
-enum ValueType
-{
-	STRING,
-	DECIMAL,
-	ANY
-};
+#include "common.hpp"
 
 struct MalformedIdentifierExcept : public std::exception
 {
@@ -46,17 +33,17 @@ struct WrongArgumentCountExcept : public std::exception
 struct WrongTokenExcept : public std::exception
 {
 	TokenType expected, got;
-	std::string keyword_name;
-	WrongTokenExcept(std::string _name, const TokenType& _expected, const TokenType& _got)
-		: expected(_expected), got(_got), keyword_name(_name) {}
+	std::string keyword_name, token_str;
+	WrongTokenExcept(std::string _keyword_name, std::string _token_str, const TokenType& _expected, const TokenType& _got)
+		: expected(_expected), got(_got), keyword_name(_keyword_name), token_str(_token_str) {}
 };
 
 struct TypeErrorExcept : public std::exception
 {
 	ValueType expected, got;
-	std::string keyword_name;
-	TypeErrorExcept(std::string _name, const ValueType& _expected, const ValueType& _got)
-		: expected(_expected), got(_got), keyword_name(_name) {}
+	std::string keyword_name, token_str;
+	TypeErrorExcept(std::string _keyword_name, std::string _token_str, const ValueType& _expected, const ValueType& _got)
+        : expected(_expected), got(_got), keyword_name(_keyword_name), token_str(_token_str) {}
 };
 
 
@@ -84,11 +71,12 @@ public:
 class Instruction
 {
 	std::vector<Token> tokens;
-	Keyword *keyword_ptr;
+	const Keyword * keyword_ptr;
 
 public:
 	// Try to parse a list of symbols as instructions
 	Instruction(std::vector<Token>& _token_list);
+    void print();
 };
 
 #endif

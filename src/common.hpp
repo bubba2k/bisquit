@@ -1,0 +1,19 @@
+#ifndef BISCUIT_INTERPRETER_COMMON_HPP
+#define BISCUIT_INTERPRETER_COMMON_HPP
+
+enum TokenType
+{
+    KEYWORD,
+    IDENTIFIER,
+    LITERAL,
+    ID_OR_LIT
+};
+
+enum ValueType
+{
+    STRING,
+    DECIMAL,
+    ANY
+};
+
+#endif //BISCUIT_INTERPRETER_COMMON_HPP

@@ -4,7 +4,7 @@ project(biscuit_interpreter)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(biscuit_interpreter)
+add_executable(biscuit_interpreter src/common.hpp)
 
 target_sources(	biscuit_interpreter PRIVATE
 				src/main.cpp
