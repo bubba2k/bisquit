@@ -12,8 +12,8 @@ struct Keyword
 	const std::string name;
 	const int expected_num_args; // -1 means: 1 to infinity, in which case all args are of same type
 	
-	const std::vector<TokenType> expected_token_types;
-	const std::vector<ValueType>  expected_value_types;
+	const std::vector<enum TokenType> expected_token_types;
+	const std::vector<enum ValueType>  expected_value_types;
 };
 
 extern const std::vector<Keyword> keywords;

@@ -12,7 +12,7 @@ enum TokenType
 enum ValueType
 {
     STRING,
-    DECIMAL,
+    NUMBER,
     ANY
 };
 
