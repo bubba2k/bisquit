@@ -1,0 +1,9 @@
+PRINT 	"This program calculates the faculty of a number."
+ASSIGN	1		fac
+NUMIN	"Please input your number!"	num
+ASSIGN	num		i
+MUL		fac		i		fac
+SUB		i		1		i
+GOTO	5		i
+PRINT	"The faculty of " num " is " fac "."
+EXIT

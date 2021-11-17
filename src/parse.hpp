@@ -6,6 +6,7 @@
 
 #include "keywords.hpp"
 #include "common.hpp"
+#include "runtime.hpp"
 
 struct Token
 {
@@ -19,8 +20,8 @@ private:
 
 public:
 	enum TokenType type;
-	enum ValueType literal_type;
-	float val_float;
+	enum ValueType value_type;
+	float val_number;
 	std::string val_string;
 
 	Token(const std::string& str);
@@ -28,12 +29,11 @@ public:
 	void print() const;
 };
 
-class Instruction
+struct Instruction
 {
 	std::vector<Token> tokens;
 	const Keyword * keyword_ptr;
 
-public:
 	// Try to parse a list of symbols as instructions
 	Instruction(std::vector<Token>& _token_list);
     void print();

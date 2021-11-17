@@ -4,8 +4,12 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <functional>
 
+#include "parse.hpp"
 #include "common.hpp"
+#include "runtime.hpp"
+#include "parse.hpp"
 
 struct Keyword
 {
@@ -14,6 +18,8 @@ struct Keyword
 	
 	const std::vector<enum TokenType> expected_token_types;
 	const std::vector<enum ValueType>  expected_value_types;
+
+	std::function<void (Runtime&,  const std::vector<Token>&)> func;
 };
 
 extern const std::vector<Keyword> keywords;

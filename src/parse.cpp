@@ -20,18 +20,44 @@ std::vector<Token> tokenize_line(const std::string& line)
     std::size_t end, begin = line.find_first_not_of(blank_space, 0);
     while(begin != std::string::npos)
     {
-        end = line.find_first_of(blank_space, begin);
-        std::string word = line.substr(begin, end - begin);
-        tokens.emplace_back(word);
+		if(line[begin] == '"') // We have struck a string literal!!!
+		{
+			end = line.find("\"", begin + 1);
 
-        begin = line.find_first_not_of(blank_space, end);
+			if(end == std::string::npos)
+			{
+				std::cout << "ERROR: Unterminated string literal!" << std::endl;
+				std::exit(EXIT_FAILURE);
+			}
+
+			end+=1;
+			std::string word = line.substr(begin, end - begin);
+        	tokens.emplace_back(word);
+
+        	begin = line.find_first_not_of(blank_space, end);
+		}
+		else if(line[begin] == '#') // It's a comment.. discard rest of line!
+		{
+			break;
+		}
+		else
+		{
+        	end = line.find_first_of(blank_space, begin);
+        	std::string word = line.substr(begin, end - begin);
+        	tokens.emplace_back(word);
+
+        	begin = line.find_first_not_of(blank_space, end);
+		}
     }
 
     return std::move(tokens);
 }
 
+// Main parsing function
 std::vector<Instruction> parse_instructions(const std::string& code_arg)
 {
+	unsigned int line_number = 1;
+
     // Make a copy of the code and append a line_end symbol to make sure the
     // parser doesn't break on EOF
     std::string code = code_arg;
@@ -44,11 +70,50 @@ std::vector<Instruction> parse_instructions(const std::string& code_arg)
     {
         end = code.find_first_of(line_end, begin);
         std::string line = code.substr(begin, end - begin);
-        std::vector<Token> tokens = tokenize_line(line);
-        instructions.emplace_back(tokens);
+	
+		try
+		{
+        	std::vector<Token> tokens = tokenize_line(line);
+        	instructions.emplace_back(tokens);
+		}
+		catch(MalformedTokenExcept& e)
+		{
+			std::cout << "ERROR: In line " << line_number << ": "
+					  << "Malformed identifier '" << e.malformed_str << "'"
+					  << std::endl;
+			std::exit(EXIT_FAILURE);
+		}
+		catch(UnknownKeywordExcept& e)
+		{
+			std::cout << "ERROR: In line " << line_number << ": "
+				      << "Unknown keyword '" << e.unknown_keyword << "'"
+					  << std::endl;
+			std::exit(EXIT_FAILURE);
+		}
+		catch(WrongArgumentCountExcept& e)
+		{
+			std::cout << "ERROR: In line " << line_number << ": "
+					  << "Wrong argument count. " << e.keyword_name
+					  << " expects " << e.expected << " arguments but got "
+					  << e.got << "." << std::endl;
+			std::exit(EXIT_FAILURE);
+		}
+		catch(WrongTokenExcept &e)
+		{
+			std::cout << "ERROR: In line " << line_number << ": "
+					  << "Token '" << e.token_str << "' is wrong kind of token. Keyword '" 
+					  << e.keyword_name << "' expected " 
+					  << resolve_TokenType_str(e.expected) << " but got " 
+				      << resolve_TokenType_str(e.got) << "." << std::endl;
+
+			std::exit(EXIT_FAILURE);
+		}
 
         begin = code.find_first_not_of(line_end, end);
+
+		++line_number;
     }
+
 
     return std::move(instructions);
 }
@@ -71,7 +136,7 @@ bool is_keyword(std::string str)
 
 bool is_string_literal(const std::string& str)
 {
-	if(str[0] == '#')
+	if(str[0] == '"' && str[str.size()-1] == '"')
 		return true;
 	else
 		return false;
@@ -88,8 +153,13 @@ bool is_decimal_literal(const std::string& str)
 
 bool is_identifier(const std::string& str)
 {
+	// First char must be alphabetic
+	if(!std::isalpha(str[0])) return false;
+
+	// Rest of identifier must be alphanumeric,
+	// but can also contain underscores
 	for(const char& c : str)
-		if(!(std::isalpha(c) || c == '_'))
+		if(!(std::isalnum(c)) && c != '_')
 			return false;
 	return true;
 }
@@ -97,11 +167,15 @@ bool is_identifier(const std::string& str)
 
 bool Token::parse_as_keyword(const std::string &str)
 {
-	if(!is_keyword(str))
+	auto str_cpy = str;
+	for(char &c : str_cpy)
+		c = (char) std::tolower(c);
+
+	if(!is_keyword(str_cpy))
 		return false;
 
 	type = TokenType::KEYWORD;
-	val_string = str;
+	val_string = str_cpy;
 		
 	return true;
 }
@@ -112,17 +186,21 @@ bool Token::parse_as_literal(const std::string &str)
 	if(is_string_literal(str))
 	{
 		type = TokenType::LITERAL;
-		literal_type = ValueType::STRING;
+		value_type = ValueType::STRING;
 		auto str_copy = str;
+
+		// Erase the quotation marks
 		str_copy.erase(0, 1);
+		str_copy.erase(str.size()-2, 1);
+
 		val_string = str_copy;
 		return true;
 	}
 	else if(is_decimal_literal(str))
 	{
 		type = TokenType::LITERAL;
-		literal_type = ValueType::NUMBER;
-		val_float = std::stof(str);
+		value_type = ValueType::NUMBER;
+		val_number = std::stof(str);
 		val_string = str;
 		return true;
 	}
@@ -137,9 +215,9 @@ bool Token::parse_as_identifier(const std::string &str)
 	if(is_identifier(str))
 	{
 		type = TokenType::IDENTIFIER;
-        literal_type = ValueType::ANY;
+        value_type = ValueType::ANY;
 		val_string = str;
-        val_float  = 0.0f;
+        val_number  = 0.0f;
         return true;
 	}
 		return false;
@@ -148,7 +226,7 @@ bool Token::parse_as_identifier(const std::string &str)
 Token::Token(const std::string &str)
 {
     // First try to parse as str, then as literal, then as identifier
-    if(!(parse_as_keyword(str) && parse_as_literal(str) && parse_as_identifier(str)))
+    if(!parse_as_keyword(str) && !parse_as_literal(str) && !parse_as_identifier(str))
 		throw MalformedTokenExcept(str); // if all fails -> malformed token
 }
 
@@ -157,24 +235,27 @@ void Token::print() const
 	switch(type)
 	{
 		case TokenType::IDENTIFIER:
-			std::cerr << "Identifier: \"" << val_string << "\"";
+			std::cout << "Identifier: " << val_string;
 			break;
 		case TokenType::KEYWORD:
-			std::cerr << "Keyword: \"" << val_string << "\"";
+			std::cout << "Keyword: \"" << val_string << "\"";
 			break;
 
 		case TokenType::LITERAL:
-			std::cerr << "Literal of type ";
-			if(literal_type == ValueType::NUMBER)
-				std::cerr << "decimal: " << val_float;
-			else if(literal_type == ValueType::STRING)
-				std::cerr << "string: \"" << val_string << "\"";
+			std::cout << "Literal of type ";
+			if(value_type == ValueType::NUMBER)
+				std::cerr << "Number: " << val_number;
+			else if(value_type == ValueType::STRING)
+				std::cout << "String: \"" << val_string << "\"";
 			break;
+
+		// Correctly parsed tokens should NEVER have this type:
 		case TokenType::ID_OR_LIT:
-			std::cerr << "Identifier or Literal?! Something went terribly wrong!!";
+			std::cout << "Something went wrong parsing this token!! "
+					  << __FILE__ << " " << __LINE__;
 	}
 		
-	std::cerr << std::endl;
+	std::cout << std::endl;
 }
 
 Instruction::Instruction(std::vector<Token>& _token_list)
@@ -203,9 +284,21 @@ Instruction::Instruction(std::vector<Token>& _token_list)
 	// Check the arguments supplied are the right kind of tokens
     for(int i = 0; i < keyword_ptr->expected_num_args; i++)
     {
-        if(keyword_ptr->expected_token_types[i] != tokens[i+1].type)
-            throw WrongTokenExcept(keyword_ptr->name, tokens[i+1].val_string, keyword_ptr->expected_token_types[i],
-                                   tokens[i+1].type);
+		switch(keyword_ptr->expected_token_types[i])
+		{
+			case TokenType::ID_OR_LIT:
+				if(tokens[i+1].type != TokenType::IDENTIFIER && tokens[i+1].type != TokenType::LITERAL)
+					throw WrongTokenExcept(keyword_ptr->name, tokens[i+1].val_string,
+											keyword_ptr->expected_token_types[i],
+											tokens[i+1].type);
+				break;
+			default:
+				if(tokens[i+1].type != keyword_ptr->expected_token_types[i])
+					throw WrongTokenExcept(keyword_ptr->name, tokens[i+1].val_string,
+											keyword_ptr->expected_token_types[i],
+											tokens[i+1].type);
+				break;
+		}
     }
 
     // if arbitrary number of args are expected, they're all one type
@@ -213,9 +306,21 @@ Instruction::Instruction(std::vector<Token>& _token_list)
     {
         for (auto it = tokens.begin() + 1; it != tokens.end(); it++)
         {
-            if (keyword_ptr->expected_token_types[0] != it->type)
-                throw WrongTokenExcept(keyword_ptr->name, it->val_string, keyword_ptr->expected_token_types[0],
-                                       it->type);
+			switch(keyword_ptr->expected_token_types[0])
+			{
+				case TokenType::ID_OR_LIT:
+					if(it->type != TokenType::IDENTIFIER && it->type != TokenType::LITERAL)
+						throw WrongTokenExcept(keyword_ptr->name, it->val_string,
+											keyword_ptr->expected_token_types[0],
+											it->type);
+					break;
+				default:
+					if(it->type != keyword_ptr->expected_token_types[0])
+						throw WrongTokenExcept(keyword_ptr->name, it->val_string,
+											keyword_ptr->expected_token_types[0],
+											it->type);
+					break;
+			}
         }
     }
 

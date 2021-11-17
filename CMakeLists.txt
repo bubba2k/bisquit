@@ -10,6 +10,8 @@ add_executable(biscuit_interpreter src/common.hpp)
 target_sources(	biscuit_interpreter PRIVATE
 				src/main.cpp
 				src/parse.cpp
+				src/runtime.cpp
+				src/util.cpp
 				src/keywords.cpp )
 
 include_directories(${CMAKE_SOURCE_DIR})
