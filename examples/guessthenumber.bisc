@@ -1,0 +1,13 @@
+PRINT	"Welcome to the number guessing game!"
+RAND	100		number
+NUMIN	"Please input your guess!"		guess
+EQUAL	number	guess	is_equal
+GOTO	12		is_equal	# win if equal
+SUB		number	guess	is_less
+GOTO	10		is_less
+PRINT	"Too big! Try again!"
+GOTO	3		1
+PRINT	"Too small! Try again!"
+GOTO	3		1
+PRINT	"Correct! The number was " number "."
+EXIT

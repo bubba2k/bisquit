@@ -1,2 +1,2 @@
-print #hello_world
-print 1.01234
+PRINT "Hello world!" # This is a comment
+EXIT

@@ -11,6 +11,7 @@
 #include "common.hpp"
 #include "exceptions.hpp"
 #include "parse.hpp"
+#include "runtime.hpp"
 
 bool request_console();
 
@@ -46,19 +47,12 @@ std::ifstream get_infile(int argc, char ** argv)
 	return infile;
 }
 
-std::string code = \
-R"del(
-PRINT 10.0 |hello_world
-)del";
-
 int main(int argc, char * argv[])
 {
-    /*
     // Get the entire source code from the file
 	std::ifstream infile = get_infile(argc, argv);
     std::stringstream buffer;
     buffer << infile.rdbuf();
-     */
 
     // On Windows, we have to explicitly request a console
     /*if(!request_console())
@@ -67,13 +61,10 @@ int main(int argc, char * argv[])
         exit(EXIT_FAILURE);
     }*/
 
-    std::cerr << "POOP" << std::endl;
+    std::vector<Instruction> instructions = parse_instructions(buffer.str());
 
-    std::vector<Instruction> instructions = parse_instructions(code);
-
-    std::cerr << "Number of instructions parsed: " << instructions.size() << std::endl;
-    for(auto& instr : instructions)
-        instr.print();
+	Runtime rt(instructions);
+	rt.run();
 
 	return 0;
 }

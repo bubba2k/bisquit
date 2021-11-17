@@ -1,0 +1,11 @@
+ASSIGN	8		n
+ASSIGN	0		a
+ASSIGN	1		b
+PRINT	a
+ADD		a		b		a
+PRINT	a
+ADD		a		b		b
+PRINT	b
+SUB		n		1		n
+GOTO	5		n
+EXIT

@@ -1,0 +1,11 @@
+PRINT 	"Hello World, this is a number: " 15
+ASSIGN	number 15
+PRINT	"Let's double it's value, shall we?"
+ADD		number number number
+PRINT	"There we go: " number
+PRINT	"Now, what if we multiplied it by 5?"
+MUL		number 5 number
+PRINT	number
+PRINT	"Not bad :)"
+PRINT	"The program will now terminate!"
+EXIT	

@@ -1,0 +1,5 @@
+ASSIGN	10		i
+PRINT	i
+SUB		i		1		i
+GOTO	2		i
+EXIT
