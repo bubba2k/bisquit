@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(biscuit_interpreter)
+project(bisquit_interpreter)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_executable(biscuit_interpreter src/common.hpp)
+add_executable(bisquit_interpreter src/common.hpp)
 
-target_sources(	biscuit_interpreter PRIVATE
+target_sources(	bisquit_interpreter PRIVATE
 				src/main.cpp
 				src/parse.cpp
 				src/runtime.cpp
