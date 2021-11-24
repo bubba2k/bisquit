@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <algorithm>
 
 #include "runtime.hpp"
 #include "exceptions.hpp"
