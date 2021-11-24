@@ -1,1 +1,5 @@
-build
+[Bb]uild/
+[Oo]ut/
+.vs/
+
+*.json
