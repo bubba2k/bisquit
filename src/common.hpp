@@ -3,7 +3,7 @@
 
 #include <string>
 
-enum TokenType
+enum class TokenType
 {
     KEYWORD,
     IDENTIFIER,
@@ -11,7 +11,7 @@ enum TokenType
     ID_OR_LIT
 };
 
-enum ValueType
+enum class ValueType
 {
     STRING,
     NUMBER,
@@ -24,8 +24,8 @@ struct Instruction;
 struct Keyword;
 struct Runtime;
 
-const std::string resolve_TokenType_str(enum TokenType);
-const std::string resolve_ValueType_str(enum ValueType);
+std::string resolve_TokenType_str(enum class TokenType);
+std::string resolve_ValueType_str(enum class ValueType);
 
 
 #endif //BISCUIT_INTERPRETER_COMMON_HPP

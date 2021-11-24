@@ -279,7 +279,7 @@ Instruction::Instruction(std::vector<Token>& _token_list)
 
 	// Make sure the keyword gets the number of arguments it needs
 	if(keyword_ptr->expected_num_args != -1 && (keyword_ptr->expected_num_args != tokens.size() - 1))
-		throw WrongArgumentCountExcept(keyword_ptr->name, keyword_ptr->expected_num_args, tokens.size() - 1);
+		throw WrongArgumentCountExcept(keyword_ptr->name, keyword_ptr->expected_num_args, static_cast<int>(tokens.size() - 1));
 
 	// Check the arguments supplied are the right kind of tokens
     for(int i = 0; i < keyword_ptr->expected_num_args; i++)
