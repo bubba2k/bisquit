@@ -169,9 +169,9 @@ const std::vector<Keyword> keywords =
 			float condition;
 
 			if(tokens[0].type == TokenType::LITERAL)
-				dest = std::floor(tokens[0].val_number);
+				dest = static_cast<int>(std::floor(tokens[0].val_number));
 			else
-				dest = std::floor(rt.resolve_var_num(tokens[0].val_string));
+				dest = static_cast<int>(std::floor(rt.resolve_var_num(tokens[0].val_string)));
 
 			if(tokens[1].type == TokenType::LITERAL)
 				condition = std::floor(tokens[1].val_number);
@@ -193,9 +193,9 @@ const std::vector<Keyword> keywords =
 			float condition;
 
 			if(tokens[0].type == TokenType::LITERAL)
-				offset = std::floor(tokens[0].val_number);
+				offset = static_cast<int>(std::floor(tokens[0].val_number));
 			else
-				offset = std::floor(rt.resolve_var_num(tokens[0].val_string));
+				offset = static_cast<int>(std::floor(rt.resolve_var_num(tokens[0].val_string)));
 
 			if(tokens[1].type == TokenType::LITERAL)
 				condition = std::floor(tokens[1].val_number);
@@ -253,9 +253,9 @@ const std::vector<Keyword> keywords =
 		{
 			int limit;
 			if(tokens[0].type == TokenType::LITERAL)
-				limit = tokens[0].val_number;
+				limit = static_cast<int>(tokens[0].val_number);
 			else
-				limit = rt.resolve_var_num(tokens[0].val_string);
+				limit = static_cast<int>(rt.resolve_var_num(tokens[0].val_string));
 
 			int number = rand() % limit;
 
