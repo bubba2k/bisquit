@@ -202,7 +202,7 @@ const std::vector<Keyword> keywords =
 			else
 				condition = std::floor(rt.resolve_var_num(tokens[1].val_string));
 
-			dest = rt.instruction_counter + dest;
+			dest = rt.instruction_counter + offset;
 
 			if(condition > 0.0f)
 				rt.jump_instructions(dest);
