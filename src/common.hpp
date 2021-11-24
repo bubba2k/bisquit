@@ -24,8 +24,8 @@ struct Instruction;
 struct Keyword;
 struct Runtime;
 
-std::string resolve_TokenType_str(enum class TokenType);
-std::string resolve_ValueType_str(enum class ValueType);
+std::string resolve_TokenType_str(TokenType);
+std::string resolve_ValueType_str(ValueType);
 
 
 #endif //BISCUIT_INTERPRETER_COMMON_HPP
