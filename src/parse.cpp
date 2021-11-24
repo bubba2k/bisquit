@@ -50,7 +50,7 @@ std::vector<Token> tokenize_line(const std::string& line)
 		}
     }
 
-    return std::move(tokens);
+    return tokens;
 }
 
 // Main parsing function
@@ -115,7 +115,7 @@ std::vector<Instruction> parse_instructions(const std::string& code_arg)
     }
 
 
-    return std::move(instructions);
+    return instructions;
 }
 
 bool is_keyword(std::string str)
