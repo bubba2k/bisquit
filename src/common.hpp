@@ -20,9 +20,9 @@ enum ValueType
 
 // some prototypes
 struct Token;
-class Instruction;
+struct Instruction;
 struct Keyword;
-class Runtime;
+struct Runtime;
 
 const std::string resolve_TokenType_str(enum TokenType);
 const std::string resolve_ValueType_str(enum ValueType);
