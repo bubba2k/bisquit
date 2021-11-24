@@ -259,7 +259,7 @@ const std::vector<Keyword> keywords =
 
 			int number = rand() % limit;
 
-			rt.assign_var_num(tokens[1].val_string, number);
+			rt.assign_var_num(tokens[1].val_string, static_cast<float>(number));
 		}
 	},
 	{
