@@ -1,5 +1,5 @@
 PRINT 	"Hello World, this is a number: " 15
-ASSIGN	number 15
+ASSIGN	15  number
 PRINT	"Let's double it's value, shall we?"
 ADD		number number number
 PRINT	"There we go: " number
