@@ -1,7 +1,7 @@
 #include "common.hpp"
 #include <string>
 
-const std::string resolve_TokenType_str(enum TokenType ttype)
+std::string resolve_TokenType_str(TokenType ttype)
 {
 	switch(ttype)
 	{
@@ -22,7 +22,7 @@ const std::string resolve_TokenType_str(enum TokenType ttype)
 	return "UNKNOW TOKENTYPE";
 }
 
-const std::string resolve_ValueType_str(enum ValueType vtype)
+std::string resolve_ValueType_str(ValueType vtype)
 {
 	switch(vtype)
 	{
