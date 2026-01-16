@@ -29,9 +29,9 @@ struct WrongArgumentCountExcept : public std::exception
 
 struct WrongTokenExcept : public std::exception
 {
-    enum TokenType expected, got;
+    TokenType expected, got;
     std::string keyword_name, token_str;
-    inline WrongTokenExcept(const std::string& _keyword_name, const std::string& _token_str, const enum TokenType& _expected, const enum TokenType& _got)
+    inline WrongTokenExcept(const std::string& _keyword_name, const std::string& _token_str, TokenType _expected, TokenType _got)
             : expected(_expected), got(_got), keyword_name(_keyword_name), token_str(_token_str) {}
 };
 
@@ -39,9 +39,9 @@ struct WrongTokenExcept : public std::exception
 // Runtime errors
 struct TypeErrorExcept : public std::exception
 {
-    enum ValueType expected, got;
+    ValueType expected, got;
     std::string token_str;
-    inline TypeErrorExcept(const std::string& _token_str, const enum ValueType& _expected, const enum ValueType& _got)
+    inline TypeErrorExcept(const std::string& _token_str, ValueType _expected, ValueType _got)
             : expected(_expected), got(_got), token_str(_token_str) {}
 };
 
